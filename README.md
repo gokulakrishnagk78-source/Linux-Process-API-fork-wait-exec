@@ -25,7 +25,46 @@ Test the C Program for the desired output.
 
 ## C Program to create new process using Linux API system calls fork() and getpid() , getppid() and to print process ID and parent Process ID using Linux API system calls
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
+int main() {
+    int status;
+
+    printf("Running ps with execl\n");
+    if (fork() == 0) {
+        execl("/bin/ps", "ps", "-f", NULL);  // full path required
+        perror("execl failed");
+        exit(1);
+    }
+    wait(&status);
+
+    if (WIFEXITED(status)) {
+        printf("Child exited with status: %d\n", WEXITSTATUS(status));
+    } else {
+        printf("Child did not exit successfully\n");
+    }
+
+    printf("Running ps with execlp (without full path)\n");
+    if (fork() == 0) {
+        execlp("ps", "ps", "-f", NULL);  // works without full path
+        perror("execlp failed");
+        exit(1);
+    }
+    wait(&status);
+
+    if (WIFEXITED(status)) {
+        printf("Child exited for execlp with status: %d\n", WEXITSTATUS(status));
+    } else {
+        printf("Child did not exit successfully\n");
+    }
+
+    printf("Done.\n");
+    return 0;
+}
 
 
 
@@ -41,6 +80,8 @@ Test the C Program for the desired output.
 
 
 
+
+<img width="625" height="285" alt="Screenshot 2026-05-01 105946" src="https://github.com/user-attachments/assets/d9716db3-6b92-49b6-95a6-2a241d341fdf" />
 
 
 
@@ -49,7 +90,30 @@ Test the C Program for the desired output.
 ## C Program to execute Linux system commands using Linux API system calls exec() , exit() , wait() family
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
+int main() {
+    int pid = fork();
+
+    if (pid < 0) {
+        perror("fork failed");
+        exit(1);
+    }
+    else if (pid == 0) {
+        printf("I am child, my PID is %d\n", getpid());
+        printf("My parent PID is: %d\n", getppid());
+        sleep(2);
+    }
+    else {
+        printf("I am parent, my PID is %d\n", getpid());
+        wait(NULL);
+    }
+
+    return 0;
+}
 
 
 
@@ -79,6 +143,7 @@ Test the C Program for the desired output.
 
 
 
+<img width="300" height="105" alt="Screenshot 2026-05-01 104457" src="https://github.com/user-attachments/assets/43b2d601-59a8-4275-9437-815df93b2a7b" />
 
 
 
